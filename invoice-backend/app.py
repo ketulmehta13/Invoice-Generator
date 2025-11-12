@@ -192,13 +192,35 @@ def generate_invoice(id):
         
         # Save generated invoice
         output_filename = f'invoice_{invoice.invoice_id}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.docx'
-        doc.save(output_filename)
+        output_path = os.path.join('generated_invoices', output_filename)
+        
+        # Create directory if it doesn't exist
+        os.makedirs('generated_invoices', exist_ok=True)
+        
+        doc.save(output_path)
         
         return jsonify({
             "message": "Invoice generated successfully",
-            "filename": output_filename
+            "filename": output_filename,
+            "download_url": f"/api/download/{output_filename}"
         }), 200
         
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+# NEW - Download generated invoice
+@app.route('/api/download/<filename>', methods=['GET'])
+def download_file(filename):
+    try:
+        file_path = os.path.join('generated_invoices', filename)
+        if os.path.exists(file_path):
+            return send_file(
+                file_path,
+                as_attachment=True,
+                download_name=filename
+            )
+        else:
+            return jsonify({"error": "File not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
