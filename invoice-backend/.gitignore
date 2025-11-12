@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite
+instance/
+.env
+.vscode/
+invoice_*.docx
